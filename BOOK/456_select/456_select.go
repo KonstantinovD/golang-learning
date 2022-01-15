@@ -22,7 +22,13 @@ import (
 // особенно осторожными при проектировании и разработке, чтобы избежать
 // таких взаимоблокировок.
 
+// также показан пример таймера t := time.NewTimer()
+// и time.After()
+
 func gen(min, max int, createNumber chan int, end chan bool) {
+	// используется так же, как и time.After()
+	notWorkingTimer := time.NewTimer(5 * time.Second)
+
 	// В данном операторе select предусмотрено три варианта
 	for {
 		// операторы select не требуют ветки default. В качестве «умной»
@@ -44,7 +50,12 @@ func gen(min, max int, createNumber chan int, end chan bool) {
 			return
 		case <-time.After(4 * time.Second):
 			fmt.Println("\ntime.After()!")
+		case <-notWorkingTimer.C:
+			{
+				fmt.Println("\nnotWorkingTimer.C!")
+			}
 		}
+
 		// Оператор select не выполняется последовательно, так как все
 		// его каналы проверяются одновременно. Если ни один из каналов,
 		// указанных в операторе select, не доступен, то оператор select
