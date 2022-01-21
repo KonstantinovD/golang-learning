@@ -24,12 +24,15 @@ func home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	files := []string{
+		"./GO_WEBSITE_01/ui/html/home.page.gohtml",
+		"./GO_WEBSITE_01/ui/html/base.layout.gohtml",
+	}
 	// Используем функцию template.ParseFiles() для чтения файла шаблона.
 	// Если возникла ошибка, мы запишем детальное сообщение ошибки и
 	// используя функцию http.Error() мы отправим пользователю
 	// ответ: 500 Internal Server Error
-	ts, err := template.ParseFiles(
-		"./GO_WEBSITE_01/ui/html/home.page.gohtml")
+	ts, err := template.ParseFiles(files...)
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(w, "Internal Server Error", 500)
