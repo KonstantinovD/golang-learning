@@ -27,6 +27,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 	files := []string{
 		"./GO_WEBSITE_01/ui/html/home.page.gohtml",
 		"./GO_WEBSITE_01/ui/html/base.layout.gohtml",
+		"./GO_WEBSITE_01/ui/html/footer.partial.gohtml",
 	}
 	// Используем функцию template.ParseFiles() для чтения файла шаблона.
 	// Если возникла ошибка, мы запишем детальное сообщение ошибки и
