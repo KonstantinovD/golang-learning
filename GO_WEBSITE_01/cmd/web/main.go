@@ -21,6 +21,18 @@ func main() {
 	mux.HandleFunc("/snippet/create", createSnippet) // fixed path
 	mux.HandleFunc("/snippet/empty/create", createEmptySnippet)
 
+	// Инициализируем FileServer, он будет обрабатывать
+	// HTTP-запросы к статическим файлам из папки "./ui/static".
+	// Обратите внимание, что переданный в функцию http.Dir путь
+	// является относительным корневой папке проект
+	fileServer := http.FileServer(
+		http.Dir("./GO_WEBSITE_01/ui/static/"))
+	// Используем функцию mux.Handle() для регистрации обработчика для
+	// всех запросов, которые начинаются с "/static/". Мы убираем
+	// префикс "/static" перед тем как запрос достигнет http.FileServer
+	mux.Handle("/static/",
+		http.StripPrefix("/static", fileServer))
+
 	// Используется функция http.ListenAndServe() для запуска нового
 	// веб-сервера. Мы передаем два параметра: TCP-адрес сети для
 	// прослушивания и созданный рутер.
