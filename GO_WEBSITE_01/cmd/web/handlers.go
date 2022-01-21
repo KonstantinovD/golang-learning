@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"strconv"
@@ -22,7 +23,27 @@ func home(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	w.Write([]byte("Hello from golang-website"))
+
+	// Используем функцию template.ParseFiles() для чтения файла шаблона.
+	// Если возникла ошибка, мы запишем детальное сообщение ошибки и
+	// используя функцию http.Error() мы отправим пользователю
+	// ответ: 500 Internal Server Error
+	ts, err := template.ParseFiles(
+		"./GO_WEBSITE_01/ui/html/home.page.gohtml")
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, "Internal Server Error", 500)
+		return
+	}
+	// Затем мы используем метод Execute() для записи содержимого
+	// шаблона в тело HTTP ответа. Последний параметр в Execute()
+	// предоставляет возможность отправки динамических данных в шаблон.
+	err = ts.Execute(w, nil)
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, "Internal Server Error", 500)
+		return
+	}
 }
 
 // Обработчик для отображения содержимого заметки.
@@ -82,28 +103,4 @@ func createEmptySnippet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write([]byte("Форма для создания новой заметки..."))
-}
-
-func main() {
-	// -- Используется функция http.NewServeMux() для инициализации
-	// нового рутера, затем функции регистрируются как обработчики
-	// -- При работе с Go встречались функции http.Handle()
-	// и http.HandleFunc(). Они регают пути с помощью DefaultServeMux.
-	// Мы используем собственный ServeMux, поскольку DefaultServeMux
-	// является глобальной переменной и любой пакет может получить к ней
-	// доступ и зарегистрировать маршрут — включая любые сторонние
-	// пакеты, которые использует ваше приложение.
-	mux := http.NewServeMux()
-	// шаблон "/" действует по сценарию «catch-all»
-	mux.HandleFunc("/", home)                        // non-fixed path (ends with '/')
-	mux.HandleFunc("/snippet", showSnippet)          // fixed path
-	mux.HandleFunc("/snippet/create", createSnippet) // fixed path
-	mux.HandleFunc("/snippet/empty/create", createEmptySnippet)
-
-	// Используется функция http.ListenAndServe() для запуска нового
-	// веб-сервера. Мы передаем два параметра: TCP-адрес сети для
-	// прослушивания и созданный рутер.
-	log.Println("Запуск веб-сервера на http://127.0.0.1:8001")
-	err := http.ListenAndServe(":8001", mux)
-	log.Fatal(err)
 }
