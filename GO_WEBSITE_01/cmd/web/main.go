@@ -41,8 +41,16 @@ func main() {
 	// HTTP-запросы к статическим файлам из папки "./ui/static".
 	// Обратите внимание, что переданный в функцию http.Dir путь
 	// является относительным корневой папке проект
-	fileServer := http.FileServer(neuteredFileSystem{
+	fileServer := http.FileServer(
+		http.Dir("./GO_WEBSITE_01/ui/static/"))
+	// попытка настроить файловую систему для статик файлов и
+	// возврата 404 привело к недоступности стилей длля страницы
+	// Поэтому вернул обратно
+	/*
+		fileServer := http.FileServer(neuteredFileSystem{
 		http.Dir("./static/")})
+	*/
+
 	// Используем функцию mux.Handle() для регистрации обработчика для
 	// всех запросов, которые начинаются с "/static/". Мы убираем
 	// префикс "/static" перед тем как запрос достигнет http.FileServer
