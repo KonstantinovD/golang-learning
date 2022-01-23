@@ -7,6 +7,14 @@ import (
 	"path/filepath"
 )
 
+// Создаем структуру `application` для хранения зависимостей всего
+// веб-приложения. Пока, что мы добавим поля только для двух логгеров,
+// мы будем расширять данную структуру по мере усложнения приложения.
+type application struct {
+	errorLog *log.Logger
+	infoLog  *log.Logger
+}
+
 func main() {
 
 	// Используйте log.New() для создания логгера. Для этого нужно
@@ -22,6 +30,12 @@ func main() {
 	errorLog := log.New(os.Stderr, "ERROR\t",
 		log.Ldate|log.Ltime|log.Lshortfile)
 
+	// Структура с зависимостями приложения.
+	app := &application{
+		errorLog: errorLog,
+		infoLog:  infoLog,
+	}
+
 	// -- Используется функция http.NewServeMux() для инициализации
 	// нового рутера, затем функции регистрируются как обработчики
 	// -- При работе с Go встречались функции http.Handle()
@@ -32,10 +46,10 @@ func main() {
 	// пакеты, которые использует ваше приложение.
 	mux := http.NewServeMux()
 	// шаблон "/" действует по сценарию «catch-all»
-	mux.HandleFunc("/", home)                        // non-fixed path (ends with '/')
-	mux.HandleFunc("/snippet", showSnippet)          // fixed path
-	mux.HandleFunc("/snippet/create", createSnippet) // fixed path
-	mux.HandleFunc("/snippet/empty/create", createEmptySnippet)
+	mux.HandleFunc("/", app.home)                        // non-fixed path (ends with '/')
+	mux.HandleFunc("/snippet", app.showSnippet)          // fixed path
+	mux.HandleFunc("/snippet/create", app.createSnippet) // fixed path
+	mux.HandleFunc("/snippet/empty/create", app.createEmptySnippet)
 
 	// Инициализируем FileServer, он будет обрабатывать
 	// HTTP-запросы к статическим файлам из папки "./ui/static".
@@ -43,8 +57,8 @@ func main() {
 	// является относительным корневой папке проект
 	fileServer := http.FileServer(
 		http.Dir("./GO_WEBSITE_01/ui/static/"))
-	// попытка настроить файловую систему для статик файлов и
-	// возврата 404 привело к недоступности стилей длля страницы
+	// Попытка настроить файловую систему для статик файлов и
+	// возврата 404 привело к недоступности стилей для страницы.
 	// Поэтому вернул обратно
 	/*
 		fileServer := http.FileServer(neuteredFileSystem{

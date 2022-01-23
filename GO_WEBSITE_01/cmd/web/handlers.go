@@ -16,7 +16,7 @@ import (
 // HTTP ответа и возвращение его пользователю, а второй параметр
 // *http.Request является указателем на структуру, которая содержит
 // информацию о текущем запросе (POST, GET, DELETE…, URL запроса)
-func home(w http.ResponseWriter, r *http.Request) {
+func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	// Проверяется, если текущий путь URL запроса точно совпадает с
 	// шаблоном "/". Если нет, вызывается функция http.NotFound()
 	if r.URL.Path != "/" {
@@ -44,14 +44,14 @@ func home(w http.ResponseWriter, r *http.Request) {
 	// предоставляет возможность отправки динамических данных в шаблон.
 	err = ts.Execute(w, nil)
 	if err != nil {
-		log.Println(err.Error())
+		app.errorLog.Println(err.Error())
 		http.Error(w, "Internal Server Error", 500)
 		return
 	}
 }
 
 // Обработчик для отображения содержимого заметки.
-func showSnippet(w http.ResponseWriter, r *http.Request) {
+func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 	// Извлекаем значение параметра id из URL и попытаемся
 	// конвертировать строку в integer. Если его нельзя конвертировать,
 	// или значение меньше 1, возвращаем 404
@@ -66,7 +66,7 @@ func showSnippet(w http.ResponseWriter, r *http.Request) {
 }
 
 // Обработчик для создания новой заметки.
-func createSnippet(w http.ResponseWriter, r *http.Request) {
+func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
 	// -- Используем метод Header().Set() для добавления заголовка
 	// 'Allow: POST' в map HTTP-headers, чтобы пользователь знал,
 	// какие HTTP-методы поддерживаются для определенного URL.
@@ -95,7 +95,7 @@ func createSnippet(w http.ResponseWriter, r *http.Request) {
 }
 
 // Обработчик для создания пустой заметки.
-func createEmptySnippet(w http.ResponseWriter, r *http.Request) {
+func (app *application) createEmptySnippet(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Allow", http.MethodPost)
 	if r.Method != http.MethodPost {
 		// Если требуется отправить какой-то код состояния, кроме 200
