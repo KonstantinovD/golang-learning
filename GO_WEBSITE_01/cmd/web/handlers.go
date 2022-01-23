@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -20,7 +19,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	// Проверяется, если текущий путь URL запроса точно совпадает с
 	// шаблоном "/". Если нет, вызывается функция http.NotFound()
 	if r.URL.Path != "/" {
-		http.NotFound(w, r)
+		app.notFound(w)
 		return
 	}
 
@@ -35,8 +34,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	// ответ: 500 Internal Server Error
 	ts, err := template.ParseFiles(files...)
 	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, "Internal Server Error", 500)
+		app.serverError(w, err)
 		return
 	}
 	// Затем мы используем метод Execute() для записи содержимого
@@ -44,8 +42,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	// предоставляет возможность отправки динамических данных в шаблон.
 	err = ts.Execute(w, nil)
 	if err != nil {
-		app.errorLog.Println(err.Error())
-		http.Error(w, "Internal Server Error", 500)
+		app.serverError(w, err)
 		return
 	}
 }
@@ -57,7 +54,7 @@ func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 	// или значение меньше 1, возвращаем 404
 	id, err := strconv.Atoi(r.URL.Query().Get("id"))
 	if err != nil || id < 1 {
-		http.NotFound(w, r)
+		app.notFound(w)
 		return
 	}
 	// Используем функцию fmt.Fprintf() для вставки значения из id в строку ответа
