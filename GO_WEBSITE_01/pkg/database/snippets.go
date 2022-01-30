@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"leaning/GO_WEBSITE_01/pkg/models"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -53,7 +54,6 @@ func (m *SnippetModel) Get(id int) (*models.Snippet, error) {
 	err = cur.Decode(&snippet)
 	if err != nil {
 		return nil, errors.New("cannot decode snippet")
-
 	}
 	if cur.Next(ctx) {
 		return nil, errors.New("found multiple snippets")
@@ -62,5 +62,29 @@ func (m *SnippetModel) Get(id int) (*models.Snippet, error) {
 }
 
 func (m *SnippetModel) Latest() ([]*models.Snippet, error) {
-	return nil, nil
+	opts := options.Find()
+	opts.SetLimit(10)
+
+	filter := bson.D{
+		{"expires", bson.D{
+			{"$gt", time.Now()},
+		}},
+	}
+
+	cur, err := m.SnippetsCollection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cur.Close(ctx)
+	var snippets []*models.Snippet
+
+	for cur.Next(ctx) {
+		var sn models.Snippet
+		err := cur.Decode(&sn)
+		if err != nil {
+			return nil, errors.New("cannot decode snippet")
+		}
+		snippets = append(snippets, &sn)
+	}
+	return snippets, nil
 }

@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
-	"html/template"
 	"net/http"
 	"strconv"
 )
@@ -25,28 +24,38 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	files := []string{
-		"./GO_WEBSITE_01/ui/html/home.page.gohtml",
-		"./GO_WEBSITE_01/ui/html/base.layout.gohtml",
-		"./GO_WEBSITE_01/ui/html/footer.partial.gohtml",
-	}
-	// Используем функцию template.ParseFiles() для чтения файла шаблона.
-	// Если возникла ошибка, мы запишем детальное сообщение ошибки и
-	// используя функцию http.Error() мы отправим пользователю
-	// ответ: 500 Internal Server Error
-	ts, err := template.ParseFiles(files...)
+	s, err := app.snippets.Latest()
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
-	// Затем мы используем метод Execute() для записи содержимого
-	// шаблона в тело HTTP ответа. Последний параметр в Execute()
-	// предоставляет возможность отправки динамических данных в шаблон.
-	err = ts.Execute(w, nil)
-	if err != nil {
-		app.serverError(w, err)
-		return
+
+	for _, snippet := range s {
+		fmt.Fprintf(w, "%v\n", snippet)
 	}
+	//
+	//files := []string{
+	//	"./GO_WEBSITE_01/ui/html/home.page.gohtml",
+	//	"./GO_WEBSITE_01/ui/html/base.layout.gohtml",
+	//	"./GO_WEBSITE_01/ui/html/footer.partial.gohtml",
+	//}
+	//// Используем функцию template.ParseFiles() для чтения файла шаблона.
+	//// Если возникла ошибка, мы запишем детальное сообщение ошибки и
+	//// используя функцию http.Error() мы отправим пользователю
+	//// ответ: 500 Internal Server Error
+	//ts, err := template.ParseFiles(files...)
+	//if err != nil {
+	//	app.serverError(w, err)
+	//	return
+	//}
+	//// Затем мы используем метод Execute() для записи содержимого
+	//// шаблона в тело HTTP ответа. Последний параметр в Execute()
+	//// предоставляет возможность отправки динамических данных в шаблон.
+	//err = ts.Execute(w, nil)
+	//if err != nil {
+	//	app.serverError(w, err)
+	//	return
+	//}
 }
 
 // Обработчик для отображения содержимого заметки.
