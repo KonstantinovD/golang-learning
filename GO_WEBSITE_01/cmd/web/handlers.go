@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
+	"leaning/GO_WEBSITE_01/pkg/models"
 	"net/http"
 	"strconv"
 )
@@ -126,4 +127,10 @@ func (app *application) createEmptySnippet(w http.ResponseWriter, r *http.Reques
 	}
 
 	w.Write([]byte("Форма для создания новой заметки..."))
+}
+
+func (app *application) showBiggestId(
+	w http.ResponseWriter, r *http.Request) {
+	app.snippets.Insert(models.Snippet{})
+	w.Write([]byte("See app logs"))
 }

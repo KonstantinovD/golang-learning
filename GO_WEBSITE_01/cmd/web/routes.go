@@ -17,6 +17,7 @@ func (app *application) routes() *http.ServeMux {
 	mux.HandleFunc("/snippet", app.showSnippet)          // fixed path
 	mux.HandleFunc("/snippet/create", app.createSnippet) // fixed path
 	mux.HandleFunc("/snippet/empty/create", app.createEmptySnippet)
+	mux.HandleFunc("/insert-snippet", app.showBiggestId)
 
 	// Инициализируем FileServer, он будет обрабатывать
 	// HTTP-запросы к статическим файлам из папки "./ui/static".

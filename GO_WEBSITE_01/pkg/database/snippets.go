@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"errors"
+	"fmt"
 	"leaning/GO_WEBSITE_01/pkg/models"
 	"time"
 
@@ -33,7 +34,18 @@ func InitDB(url string) (*SnippetModel, error) {
 	return &model, nil
 }
 
-func (m *SnippetModel) Insert(title, content, expires string) (int, error) {
+func (m *SnippetModel) Insert(snippet models.Snippet) (int, error) {
+	snippet.Created = time.Now()
+	opts := options.FindOne()
+	//opts.SetLimit(1)
+	opts.SetSort(bson.D{{"snippetId", -1}})
+	//start from biggest
+
+	snippetWithId := bson.M{}
+	if err := m.SnippetsCollection.FindOne(ctx, bson.M{}, opts).Decode(&snippetWithId); err != nil {
+		return 0, errors.New("cannot insert snippet")
+	}
+	fmt.Println(snippetWithId)
 	return 0, nil
 }
 
