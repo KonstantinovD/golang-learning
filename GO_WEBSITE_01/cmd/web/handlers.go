@@ -1,7 +1,9 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"go.mongodb.org/mongo-driver/mongo"
 	"html/template"
 	"net/http"
 	"strconv"
@@ -57,9 +59,20 @@ func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 		app.notFound(w)
 		return
 	}
+
+	s, err := app.snippets.Get(id)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			app.notFound(w)
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
+
 	// Используем функцию fmt.Fprintf() для вставки значения из id в строку ответа
 	// и записываем его в http.ResponseWriter.
-	fmt.Fprintf(w, "Отображение выбранной заметки с ID %d...", id)
+	fmt.Fprintf(w, "%v", s)
 }
 
 // Обработчик для создания новой заметки.

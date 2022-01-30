@@ -1,6 +1,8 @@
 package main
 
 import (
+	_ "github.com/lib/pq"
+	"leaning/GO_WEBSITE_01/pkg/database"
 	"log"
 	"net/http"
 	"os"
@@ -13,9 +15,11 @@ import (
 type application struct {
 	errorLog *log.Logger
 	infoLog  *log.Logger
+	snippets *database.SnippetModel
 }
 
 func main() {
+	setupEnvVars()
 
 	// Используйте log.New() для создания логгера. Для этого нужно
 	// три параметра: место назначения для записи логов (os.Stdout),
@@ -30,10 +34,16 @@ func main() {
 	errorLog := log.New(os.Stderr, "ERROR\t",
 		log.Ldate|log.Ltime|log.Lshortfile)
 
+	db, dberr := database.InitDB(os.Getenv("DATABASE_URL"))
+	if dberr != nil {
+		errorLog.Fatal(dberr)
+	}
+
 	// Структура с зависимостями приложения.
 	app := &application{
 		errorLog: errorLog,
 		infoLog:  infoLog,
+		snippets: db,
 	}
 	// рутер
 	mux := app.routes()
@@ -76,4 +86,8 @@ func (nfs neuteredFileSystem) Open(path string) (http.File, error) {
 		}
 	}
 	return f, nil
+}
+
+func setupEnvVars() {
+	os.Setenv("DATABASE_URL", "mongodb://localhost:27017/")
 }
