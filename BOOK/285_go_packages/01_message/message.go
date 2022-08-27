@@ -26,7 +26,7 @@ func OpenMessage() Message {
 		hidden: "012"}
 }
 
-func ClosedMessage() Message {
+func closedMessage() Message {
 	return Message{
 		Value:  "Closed msg",
 		Sevrt:  severity{Level: 12}, // but no restrictions for 'enums'

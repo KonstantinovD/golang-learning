@@ -31,10 +31,10 @@ func main() {
 
 	array4 := [4]int{1, 2, 3, 4}
 	s6 := []int{11, 22, 33, 44, 55, 66}
-	fmt.Println("array4:", array4[0:])
+	fmt.Println("array4:", array4)
 	fmt.Println("s6:", s6)
 	copy(s6, array4[0:])
-	fmt.Println("array4:", array4[0:])
+	fmt.Println("array4:", array4)
 	fmt.Println("s6:", s6)
 	fmt.Println("---------------------")
 	fmt.Println()
