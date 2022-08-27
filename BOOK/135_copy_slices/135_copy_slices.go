@@ -34,7 +34,8 @@ func main() {
 	fmt.Println("array4:", array4)
 	fmt.Println("s6:", s6)
 	copy(s6, array4[0:])
-	fmt.Println("array4:", array4)
+	fmt.Println("array4:", array4[:]) // better - передача ток слайса
+	// а не всего массива целиком
 	fmt.Println("s6:", s6)
 	fmt.Println("---------------------")
 	fmt.Println()
